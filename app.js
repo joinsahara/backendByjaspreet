@@ -8,6 +8,10 @@ const mongoose = require('mongoose');
 
 const productRoutes = require('./api/routes/product')
 const orderRoutes = require('./api/routes/order')
+const historyRoutes = require('./api/routes/history')
+const vendorRoutes = require('./api/routes/vendor')
+
+
 
 mongoose.connect('mongodb://localhost:27017/jassicar', { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
@@ -16,23 +20,16 @@ db.once('open', function () {
   console.log("we are connected")
 });
 
-app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(morgan('dev')); // middleware to connect with database
+app.use(bodyParser.urlencoded({extended: false}));// body parser is used to parse the requests from body
 app.use(bodyParser.json());
 
-// app.use((req,res, next)=>{
-//     res.header('Access-Counter-Allow-Origin','*'); //* is bcz you want to give acees to any user and can restrict the use by giving particular url
-//     res.header('Acess- Control-Allow-Headers',
-//     'Orgin, X-Requested-With, Content-Type, Accept, Authorization');
-
-// if (req.method === 'OPTIONS'){
-//     req.header('Acess- Control-Allow-Headers','PUT, POST, PATCH, DELETE, GET');
-//     return res.status(200).json({});
-// }
-// next();
-// });
 app.use(('/product',productRoutes));
 app.use(('/order',orderRoutes));
+app.use(('/history',historyRoutes));
+app.use(('/vendor',historyRoutes));
+
+
 
 
 app.use((req,res,next)=>{

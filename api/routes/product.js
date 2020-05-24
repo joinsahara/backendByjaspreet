@@ -1,4 +1,4 @@
-const express = require('express'); 
+const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 
@@ -9,19 +9,24 @@ const Product = require("../models/product");
 router.get('/product', (req, res, next) => {
 
     Product.find()
-    .select('name price _id') // it will only show name, price and _id 
+        .select('Product_id Product_Name Vendor_id Product_Title Product_description Product_Type') // it will only show name, price and _id 
         .exec()
         .then(docs => {
-            const response ={
-                total_No_Of_Items : docs.length,
-                product : docs.map(doc=>{
+            const response = {
+                total_No_Of_Items: docs.length,
+                product: docs.map(doc => {
                     return {
-                        name : doc.name,
-                        price:doc.price,
-                        _id : doc._id,
-                        request :{
+                        Product_Name: doc.Product_Name,
+                        Vendor_id: doc.Vendor_id,
+                        Product_Title: doc.Product_Title,
+                        Product_Description: doc.Product_Description,
+                        Product_Type: doc.Product_Type,
+                        // Product_Url: doc.Product_Url,
+                        // // price:doc.price,
+                        Product_id: doc.Product_id,
+                        request: {
                             type: "Get",
-                            url : "localhost/product/"+doc._id
+                            Product_Url: "localhost/product/" + doc._id
                         }
                     }
                 })
@@ -31,33 +36,34 @@ router.get('/product', (req, res, next) => {
         .catch(err => {
             console.log(err);
             res.status(500).json({
-               error : err 
+                error: err
             })
         })
 })
 //to post new product
 router.post('/product', (req, res, next) => {
-    
     const product = new Product({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        price: req.body.price,
-
+        // Product_id: new mongoose.Types.ObjectId(),
+        Product_Name: req.body.Product_Name,
+        Vendor_id: req.body.Vendor_id,
+        Product_Title: req.body.Product_Title,
+        Product_Description: req.body.Product_Description,
+        Product_Type: req.body.Product_Type
        
-
     })
-    //save data in database 
-    product.save(function (err, product) {
+
+    product.save( (err, product)=> {
         if (err){ return res.json({error})}
-       
-        
-    
-      res.status(201).json({
-        message: "handling post request to /product",
-        createdProduct: product ,
-        CompleteIfo : "localhost/product/"+product._id
-    });
- });
+
+
+
+        res.status(201).json({
+            message: "handling post request to /product",
+            createdProduct: product,
+            CompleteIfo: "localhost/product/" +product._id
+        });
+    })
+     
 });
 // to get product info with particular id
 router.get('/product/:productId', (req, res, next) => {
@@ -66,9 +72,19 @@ router.get('/product/:productId', (req, res, next) => {
         .exec()
         .then(docs => {
             console.log(docs);
-            res.status(200).json({name : docs.name,
-            price: docs.price,
-        _id: docs._id });
+            res.status(200).json({
+                Product_id: docs.Product_id,
+                Product_Name: docs.Product_Name,
+                Vendor_id: docs.Vendor_id,
+                Product_Title: docs.Product_Title,
+                Product_Description: docs.Product_Description,
+                Product_Type: docs.Product_Type,
+                
+
+
+                
+               
+            });
         })
         .catch(err => {
             console.log(err);
@@ -82,40 +98,44 @@ router.get('/product/:productId', (req, res, next) => {
 router.patch('/product/:productId', (req, res, next) => {
     const id = req.params.productId;
     const updateOps = {};
-    for(const ops of req.body){
+    for (const ops of req.body) {
         update[ops.propName] = ops.value;
     }
-    Product.update({_id : id},{$set:updateOps})
-    .exec()
-    .then(result=>{
-        console.log(res);
-        res.status(200).json({updated_data: result,
-       url: "localhost/product/"+result._id })
-    })
-    .catch(err =>{
-      console.log(err)
-      res.status(500).json({
-          error: err
-      });
-    })
+    Product.update({ Product_id: id }, { $set: updateOps })
+        .exec()
+        .then(result => {
+            console.log(res);
+            res.status(200).json({
+                updated_data: result,
+                url: "localhost/product/" + result._id
+            })
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: err
+            });
+        })
 });
 
 
 // to delete to particular product by id
 router.delete('/product/:productId', (req, res, next) => {
     const id = req.params.productId
-    Product.remove({_id : id})
-    .exec()
-    .then(result => {
-        res.status(200).json({deleted_data: result,
-            url: "localhost/product/"+result._id});
-    })
-    .catch(err =>{
-        res.status(500).json({
-            error : err
+    Product.remove({ Product_id: id })
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                deleted_data: result,
+                url: "localhost/product/" + result._id
+            });
         })
-    })
-    });
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            })
+        })
+});
 
 // export of product module
 module.exports = router;
