@@ -42,13 +42,20 @@ router.get('/product', (req, res, next) => {
 })
 //to post new product
 router.post('/product', (req, res, next) => {
+<<<<<<< HEAD
     const product = new Product({
         // Product_id: new mongoose.Types.ObjectId(),
+=======
+
+    const product = new Product({
+        Product_id: new mongoose.Types.ObjectId(),
+>>>>>>> 6ef13e913beaa4f6412c9521dda7ced7f85ce6ec
         Product_Name: req.body.Product_Name,
         Vendor_id: req.body.Vendor_id,
         Product_Title: req.body.Product_Title,
         Product_Description: req.body.Product_Description,
         Product_Type: req.body.Product_Type
+<<<<<<< HEAD
        
     })
 
@@ -63,6 +70,28 @@ router.post('/product', (req, res, next) => {
             CompleteIfo: "localhost/product/" +product._id
         });
     })
+=======
+        // Product_Url : req.body.url,
+        // Product_id: new mongoose.Types.ObjectId(),
+        // Product_Name: "hello",
+        // Vendor_id: 123,                     testing
+        // Product_Title: "car",
+        // Product_Description: "good car",
+        // Product_Type: "good"
+    })
+
+    product.save( (err, product)=> {
+        if (err){ return res.json({error})}
+
+
+
+        res.status(201).json({
+            message: "handling post request to /product",
+            createdProduct: product,
+            CompleteIfo: "localhost/product/" +product.Product._id
+        });
+    })
+>>>>>>> 6ef13e913beaa4f6412c9521dda7ced7f85ce6ec
      
 });
 // to get product info with particular id
