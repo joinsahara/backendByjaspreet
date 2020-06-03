@@ -7,13 +7,13 @@ const mongoose = require('mongoose');
 
 
 const productRoutes = require('./api/routes/product')
-const orderRoutes = require('./api/routes/order')
 const historyRoutes = require('./api/routes/history')
 const vendorRoutes = require('./api/routes/vendor')
+const userRoutes = require('./api/routes/user')
 
 
-
-mongoose.connect('mongodb://localhost:27017/jassicar', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.set('useCreateIndex', true)
+mongoose.connect('mongodb+srv://m001-student:m001-mongodb-basics@sandbox-s5rkh.mongodb.net/test', { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
@@ -25,9 +25,9 @@ app.use(bodyParser.urlencoded({extended: false}));// body parser is used to pars
 app.use(bodyParser.json());
 
 app.use(('/product',productRoutes));
-app.use(('/order',orderRoutes));
 app.use(('/history',historyRoutes));
-app.use(('/vendor',historyRoutes));
+app.use(('/vendor',vendorRoutes));
+app.use(('/user',userRoutes));
 
 
 

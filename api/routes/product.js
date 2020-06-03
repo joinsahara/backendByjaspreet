@@ -1,29 +1,31 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-
-
+const checkAuth = require('../middleware/chack-auth');
 const Product = require("../models/product");
+// const { request } = require('../../app');
+
 
 // dealing with /product with get request
-router.get('/product', (req, res, next) => {
+router.get('/', (req, res, next) => {
+   
 
     Product.find()
-        .select('Product_id Product_Name Vendor_id Product_Title Product_description Product_Type') // it will only show name, price and _id 
+        .select('_id Product_Name Vendor_id Product_Title Product_description Product_Type') // it will only show name, price and _id 
         .exec()
         .then(docs => {
             const response = {
                 total_No_Of_Items: docs.length,
                 product: docs.map(doc => {
                     return {
+                        
                         Product_Name: doc.Product_Name,
                         Vendor_id: doc.Vendor_id,
                         Product_Title: doc.Product_Title,
                         Product_Description: doc.Product_Description,
                         Product_Type: doc.Product_Type,
-                        // Product_Url: doc.Product_Url,
-                        // // price:doc.price,
-                        Product_id: doc.Product_id,
+                       
+                       
                         request: {
                             type: "Get",
                             Product_Url: "localhost/product/" + doc._id
@@ -40,80 +42,89 @@ router.get('/product', (req, res, next) => {
             })
         })
 })
+
+
+
+
+
 //to post new product
-router.post('/product', (req, res, next) => {
-<<<<<<< HEAD
-    const product = new Product({
-        // Product_id: new mongoose.Types.ObjectId(),
-=======
+router.post('/', checkAuth, (req, res, next) => {
+    // router.post('/',  (req, res, next) => {
 
     const product = new Product({
-        Product_id: new mongoose.Types.ObjectId(),
->>>>>>> 6ef13e913beaa4f6412c9521dda7ced7f85ce6ec
+        _id: new mongoose.Types.ObjectId(),
+
         Product_Name: req.body.Product_Name,
         Vendor_id: req.body.Vendor_id,
         Product_Title: req.body.Product_Title,
         Product_Description: req.body.Product_Description,
         Product_Type: req.body.Product_Type
-<<<<<<< HEAD
+
+        // Product_Name: "laptop",
+        // Vendor_id: 1,
+        // Product_Title: "hp202",
+        // Product_Description: "good laptop",
+        // Product_Type: "electronics"
+
        
-    })
+    });
 
-    product.save( (err, product)=> {
-        if (err){ return res.json({error})}
-
-
-
+    product
+    .save()
+    .then(result=>{
+        console.log(result)
         res.status(201).json({
-            message: "handling post request to /product",
-            createdProduct: product,
-            CompleteIfo: "localhost/product/" +product._id
+            message: "product Created successfully",
+            createdProduct: {
+                product : product,
+                request :{
+                    type : 'GET',
+                    url : "http://localhost/product/"+result._id
+                }
+            }
+            
         });
+
     })
-=======
-        // Product_Url : req.body.url,
-        // Product_id: new mongoose.Types.ObjectId(),
-        // Product_Name: "hello",
-        // Vendor_id: 123,                     testing
-        // Product_Title: "car",
-        // Product_Description: "good car",
-        // Product_Type: "good"
-    })
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({
+            error : err
 
-    product.save( (err, product)=> {
-        if (err){ return res.json({error})}
-
-
-
-        res.status(201).json({
-            message: "handling post request to /product",
-            createdProduct: product,
-            CompleteIfo: "localhost/product/" +product.Product._id
         });
-    })
->>>>>>> 6ef13e913beaa4f6412c9521dda7ced7f85ce6ec
+    });
+        
+       
+    });
+
+      
+
+    
+
      
-});
+
+
+
+
 // to get product info with particular id
-router.get('/product/:productId', (req, res, next) => {
+router.get('/:productId', (req, res, next) => {
     const id = req.params.productId;
     Product.findById(id)
         .exec()
         .then(docs => {
             console.log(docs);
             res.status(200).json({
-                Product_id: docs.Product_id,
+                Product_Id: docs.Product_Id,
                 Product_Name: docs.Product_Name,
                 Vendor_id: docs.Vendor_id,
                 Product_Title: docs.Product_Title,
                 Product_Description: docs.Product_Description,
                 Product_Type: docs.Product_Type,
-                
-
-
-                
-               
-            });
+                request :{
+                    type : 'GET',
+                    url : 'http://localhost/product'
+                }
+                });
         })
         .catch(err => {
             console.log(err);
@@ -123,8 +134,12 @@ router.get('/product/:productId', (req, res, next) => {
 });
 
 
+
+
+
+
 //to update the particular product
-router.patch('/product/:productId', (req, res, next) => {
+router.patch('/:productId',checkAuth, (req, res, next) => {
     const id = req.params.productId;
     const updateOps = {};
     for (const ops of req.body) {
@@ -149,7 +164,7 @@ router.patch('/product/:productId', (req, res, next) => {
 
 
 // to delete to particular product by id
-router.delete('/product/:productId', (req, res, next) => {
+router.delete('/:productId',checkAuth, (req, res, next) => {
     const id = req.params.productId
     Product.remove({ Product_id: id })
         .exec()

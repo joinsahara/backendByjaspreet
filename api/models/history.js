@@ -6,7 +6,9 @@ const historySchema = mongoose.Schema({
     Product_Type :{type: String, required: true},
     Vendor_id :{type: Number, required: true},
     
-    Visit_Date: {type: Date, required: true}
+    Visit_Date: {type:Date,
+      default: Date.now
+    }
     
     
 });

@@ -1,12 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-
-
+const checkAuth = require('../middleware/chack-auth');
 const History = require("../models/history");
 
 // dealing with /product with get request
-router.get('/history', (req, res, next) => {
+router.get('/',checkAuth, (req, res, next) => {
 
     History.find()
         .select('User_id Product_Title Product_description Product_Type Vendor_id Visit_Date   ') // it will only show name, price and _id 
@@ -43,15 +42,15 @@ router.get('/history', (req, res, next) => {
 
 
 // to post new history
-router.post('/history', (req, res, next) => {
+router.post('/',checkAuth, (req, res, next) => {
 
     const history = new History({
-        User_id: req.body.User_id,
+        // User_id: req.body.User_id,
         Product_Title: req.body.Product_Title,
         Product_Description: req.body.Product_Description,
         Product_Type: req.body.Product_Type,
         Vendor_id: req.body.Vendor_id,
-        Visit_Date: req.body.Visit_Date,
+        // Visit_Date: req.body.Visit_Date,
 
     })
 
@@ -67,7 +66,7 @@ router.post('/history', (req, res, next) => {
 });
 
 // to get history info with particular id
-router.get('/history/:historyId', (req, res, next) => {
+router.get('/:historyId',checkAuth, (req, res, next) => {
     const id = req.params.historyId;
     History.findById(id)
         .exec()
@@ -95,7 +94,7 @@ router.get('/history/:historyId', (req, res, next) => {
 
 
 // to delete to particular product by id
-router.delete('/history/:historyId', (req, res, next) => {
+router.delete('/:historyId',checkAuth, (req, res, next) => {
     const id = req.params.historyId
     Product.remove({ User_id: id })
         .exec()
