@@ -10,6 +10,8 @@ const productRoutes = require('./api/routes/product')
 const historyRoutes = require('./api/routes/history')
 const vendorRoutes = require('./api/routes/vendor')
 const userRoutes = require('./api/routes/user')
+const searchRoutes = require('./axios')
+
 
 
 mongoose.set('useCreateIndex', true)
@@ -28,6 +30,8 @@ app.use(('/product',productRoutes));
 app.use(('/history',historyRoutes));
 app.use(('/vendor',vendorRoutes));
 app.use(('/user',userRoutes));
+app.use(('/search',searchRoutes));
+
 
 
 
