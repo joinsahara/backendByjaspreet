@@ -43,6 +43,7 @@ router.get('/',checkAuth, (req, res, next) => {
 
 // to post new history
 router.post('/',checkAuth, (req, res, next) => {
+// router.post('/', (req, res, next) => {
 
     const history = new History({
         // User_id: req.body.User_id,
@@ -94,14 +95,14 @@ router.get('/:historyId',checkAuth, (req, res, next) => {
 
 
 // to delete to particular product by id
-router.delete('/:historyId',checkAuth, (req, res, next) => {
-    const id = req.params.historyId
-    Product.remove({ User_id: id })
+router.delete('/:productId',checkAuth, (req, res, next) => {
+    const id = req.params.productId
+    History.remove({ _id: id })
         .exec()
         .then(result => {
             res.status(200).json({
                 deleted_data: result,
-                url: "localhost/history/" + result._id
+                url: "localhost/product/" 
             });
         })
         .catch(err => {

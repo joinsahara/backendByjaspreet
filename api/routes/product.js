@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
+
 const checkAuth = require('../middleware/chack-auth');
 const Product = require("../models/product");
-// const { request } = require('../../app');
+
+
+
 
 
 // dealing with /product with get request
@@ -18,7 +21,7 @@ router.get('/', (req, res, next) => {
                 total_No_Of_Items: docs.length,
                 product: docs.map(doc => {
                     return {
-                        
+                        _id : doc._id,
                         Product_Name: doc.Product_Name,
                         Vendor_id: doc.Vendor_id,
                         Product_Title: doc.Product_Title,
@@ -107,14 +110,14 @@ router.post('/', checkAuth, (req, res, next) => {
 
 
 // to get product info with particular id
-router.get('/:productId', (req, res, next) => {
+router.get('/:productId', checkAuth, (req, res, next) => {
     const id = req.params.productId;
     Product.findById(id)
         .exec()
         .then(docs => {
             console.log(docs);
             res.status(200).json({
-                Product_Id: docs.Product_Id,
+                
                 Product_Name: docs.Product_Name,
                 Vendor_id: docs.Vendor_id,
                 Product_Title: docs.Product_Title,
@@ -139,39 +142,32 @@ router.get('/:productId', (req, res, next) => {
 
 
 //to update the particular product
-router.patch('/:productId',checkAuth, (req, res, next) => {
-    const id = req.params.productId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        update[ops.propName] = ops.value;
+router.patch('/:productId',checkAuth ,async (req,res)=>{
+    
+    try{
+   const updatedProduct =  await Product.updateOne(
+       {_id: req.params.productId},
+    {$set:{Product_Title : req.body.Product_Title} }
+    )
+    res.json(updatedProduct)
+
+    } catch(err){
+        res.send({
+            message : err
+        })
     }
-    Product.update({ Product_id: id }, { $set: updateOps })
-        .exec()
-        .then(result => {
-            console.log(res);
-            res.status(200).json({
-                updated_data: result,
-                url: "localhost/product/" + result._id
-            })
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({
-                error: err
-            });
-        })
-});
+   });
 
 
 // to delete to particular product by id
 router.delete('/:productId',checkAuth, (req, res, next) => {
     const id = req.params.productId
-    Product.remove({ Product_id: id })
+    Product.remove({ _id: id })
         .exec()
         .then(result => {
             res.status(200).json({
                 deleted_data: result,
-                url: "localhost/product/" + result._id
+                url: "localhost/product/" 
             });
         })
         .catch(err => {

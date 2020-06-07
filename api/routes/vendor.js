@@ -6,7 +6,7 @@ const router = express.Router();
 const Vendor = require("../models/vendor");
 
 // dealing with /product with get request
-router.get('/vendor', (req, res, next) => {
+router.get('/', (req, res, next) => {
 
     Vendor.find()
         .select(' Vendor_id Vendor_Name ') // it will only show name, price and _id 
@@ -37,10 +37,10 @@ router.get('/vendor', (req, res, next) => {
         })
 })
 //to post new product
-router.post('/vendor', (req, res, next) => {
+router.post('/', (req, res, next) => {
 
     const vendor = new Vendor({
-     Vendor_id : req.body.Vendor_id,
+     
      Vendor_Name: req.body.Vendor_Name
     
     })
@@ -59,7 +59,7 @@ router.post('/vendor', (req, res, next) => {
      
 });
 // to get product info with particular id
-router.get('/vendor/:vendorId', (req, res, next) => {
+router.get('/:vendorId', (req, res, next) => {
     const id = req.params.vendorId;
     Vendor.findById(id)
         .exec()
@@ -78,32 +78,27 @@ router.get('/vendor/:vendorId', (req, res, next) => {
 
 
 //to update the particular product
-router.patch('/vendor/:vendorId', (req, res, next) => {
-    const id = req.params.vendorId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        update[ops.propName] = ops.value;
+router.patch('/:vendorId', async (req, res, next) => {
+   try{
+       const updatedVendor = await Vendor.updateOne(
+           {_id: req.params.vendorId},
+           {$set:{Vendor_Name : req.body.Vendor_Name }}
+       )
+       res.status(200).json({
+        updated_data: updatedVendor,
+        url: "localhost/vendor/" + updatedVendor._id
+   })
+    }catch(err ) {
+        console.log(err)
+        res.status(500).json({
+            error: err
+        });
     }
-    Vendor.update({ Vendor_id: id }, { $set: updateOps })
-        .exec()
-        .then(result => {
-            console.log(res);
-            res.status(200).json({
-                updated_data: result,
-                url: "localhost/vendor/" + result._id
-            })
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({
-                error: err
-            });
-        })
-});
-
+    
+})
 
 // to delete to particular product by id
-router.delete('/vendor/:vendorId', (req, res, next) => {
+router.delete('/:vendorId', (req, res, next) => {
     const id = req.params.vendorId
     Vendor.remove({ _id: id })
         .exec()
